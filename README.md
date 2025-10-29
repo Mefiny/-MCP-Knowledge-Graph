@@ -300,6 +300,4 @@ MIT License
 
 ---
 
-**Made with ❤️ by MCP Team**
-
 如有问题，请查看 [COMPLETION_SUMMARY.md](./COMPLETION_SUMMARY.md) 获取详细技术文档。
