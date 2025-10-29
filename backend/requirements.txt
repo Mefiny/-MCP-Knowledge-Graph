@@ -1,0 +1,41 @@
+# Backend Dependencies for MCP Platform
+
+# Web Framework
+fastapi==0.103.2
+uvicorn[standard]==0.22.0
+python-multipart==0.0.6
+
+# File Parsing
+PyMuPDF==1.23.8
+python-docx==1.1.0
+python-pptx==0.6.23
+
+# NLP & Text Processing
+spacy==3.7.2
+sentence-transformers==2.3.1
+transformers==4.37.2
+
+# Vector Database
+chromadb==0.4.22
+
+# Graph Database
+neo4j==5.16.0
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.3
+
+# LLM Integration (Optional)
+openai==1.10.0
+
+# Utilities
+python-dotenv==1.0.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# HTTP Client
+httpx==0.26.0
+requests==2.31.0
+
+# Logging
+loguru==0.7.2

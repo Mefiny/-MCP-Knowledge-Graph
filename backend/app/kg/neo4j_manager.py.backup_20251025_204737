@@ -1,0 +1,556 @@
+"""
+Neo4j Knowledge Graph Manager
+知识图谱管理器 - 负责与Neo4j交互
+"""
+import os
+from typing import List, Dict, Optional, Any
+from neo4j import GraphDatabase, Driver
+from loguru import logger
+
+
+class Neo4jManager:
+    """Neo4j数据库管理器"""
+
+    def __init__(
+        self,
+        uri: str = None,
+        user: str = None,
+        password: str = None
+    ):
+        """
+        初始化Neo4j连接
+
+        Args:
+            uri: Neo4j连接URI (默认从环境变量读取)
+            user: 用户名 (默认从环境变量读取)
+            password: 密码 (默认从环境变量读取)
+        """
+        self.uri = uri or os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        self.user = user or os.getenv("NEO4J_USER", "neo4j")
+        self.password = password or os.getenv("NEO4J_PASSWORD", "password")
+
+        self.driver: Optional[Driver] = None
+        self.connected = False
+
+        self._connect()
+
+    def _connect(self):
+        """建立Neo4j连接"""
+        try:
+            self.driver = GraphDatabase.driver(
+                self.uri,
+                auth=(self.user, self.password)
+            )
+            # 测试连接
+            self.driver.verify_connectivity()
+            self.connected = True
+            logger.info(f"✓ Connected to Neo4j at {self.uri}")
+        except Exception as e:
+            logger.warning(f"✗ Failed to connect to Neo4j: {str(e)}")
+            logger.info("Neo4j knowledge graph features will be disabled")
+            self.connected = False
+
+    def close(self):
+        """关闭连接"""
+        if self.driver:
+            self.driver.close()
+            logger.info("Neo4j connection closed")
+
+    def _serialize_neo4j_value(self, value):
+        """
+        递归地将Neo4j对象转换为可序列化的Python对象
+
+        Args:
+            value: Neo4j返回的值
+
+        Returns:
+            可序列化的Python对象
+        """
+        from neo4j.graph import Node, Relationship
+
+        if isinstance(value, Node):
+            # 将Node对象转换为字典
+            return dict(value)
+        elif isinstance(value, Relationship):
+            # 将Relationship对象转换为字典
+            return {
+                "type": value.type,
+                **dict(value)
+            }
+        elif isinstance(value, list):
+            # 递归处理列表
+            return [self._serialize_neo4j_value(item) for item in value]
+        elif isinstance(value, dict):
+            # 递归处理字典
+            return {k: self._serialize_neo4j_value(v) for k, v in value.items()}
+        else:
+            # 基本类型直接返回
+            return value
+
+    def execute_query(self, query: str, parameters: Dict = None) -> List[Dict]:
+        """
+        执行Cypher查询
+
+        Args:
+            query: Cypher查询语句
+            parameters: 查询参数
+
+        Returns:
+            查询结果列表
+        """
+        if not self.connected:
+            logger.warning("Neo4j not connected, query skipped")
+            return []
+
+        parameters = parameters or {}
+
+        try:
+            with self.driver.session() as session:
+                result = session.run(query, parameters)
+                # 将每条记录转换为字典，并序列化Neo4j对象
+                records = []
+                for record in result:
+                    record_dict = {}
+                    for key in record.keys():
+                        record_dict[key] = self._serialize_neo4j_value(record[key])
+                    records.append(record_dict)
+                return records
+        except Exception as e:
+            logger.error(f"Query execution failed: {str(e)}")
+            logger.debug(f"Query: {query}, Parameters: {parameters}")
+            return []
+
+    def create_constraints(self):
+        """创建图数据库约束和索引"""
+        if not self.connected:
+            return
+
+        constraints = [
+            # 文档节点唯一约束
+            "CREATE CONSTRAINT IF NOT EXISTS FOR (d:Document) REQUIRE d.id IS UNIQUE",
+            # 实体节点唯一约束
+            "CREATE CONSTRAINT IF NOT EXISTS FOR (e:Entity) REQUIRE e.id IS UNIQUE",
+            # 概念节点唯一约束
+            "CREATE CONSTRAINT IF NOT EXISTS FOR (c:Concept) REQUIRE c.id IS UNIQUE",
+        ]
+
+        for constraint in constraints:
+            self.execute_query(constraint)
+
+        logger.info("Neo4j constraints and indexes created")
+
+    def clear_database(self):
+        """清空数据库（谨慎使用！）"""
+        if not self.connected:
+            return
+
+        query = "MATCH (n) DETACH DELETE n"
+        self.execute_query(query)
+        logger.warning("⚠ Neo4j database cleared")
+
+    def get_stats(self) -> Dict[str, int]:
+        """获取图数据库统计信息"""
+        if not self.connected:
+            return {"nodes": 0, "relationships": 0, "connected": False}
+
+        node_count_query = "MATCH (n) RETURN count(n) as count"
+        rel_count_query = "MATCH ()-[r]->() RETURN count(r) as count"
+
+        node_result = self.execute_query(node_count_query)
+        rel_result = self.execute_query(rel_count_query)
+
+        return {
+            "nodes": node_result[0]["count"] if node_result else 0,
+            "relationships": rel_result[0]["count"] if rel_result else 0,
+            "connected": True
+        }
+
+    # ==================== 文档节点操作 ====================
+
+    def create_document_node(self, document_id: str, metadata: Dict) -> bool:
+        """
+        创建文档节点
+
+        Args:
+            document_id: 文档ID
+            metadata: 文档元数据
+
+        Returns:
+            是否成功
+        """
+        if not self.connected:
+            return False
+
+        query = """
+        MERGE (d:Document {id: $document_id})
+        SET d.file_name = $file_name,
+            d.title = $title,
+            d.author = $author,
+            d.file_type = $file_type,
+            d.created_at = datetime()
+        RETURN d
+        """
+
+        parameters = {
+            "document_id": document_id,
+            "file_name": metadata.get("file_name", ""),
+            "title": metadata.get("title", ""),
+            "author": metadata.get("author", ""),
+            "file_type": metadata.get("file_type", "")
+        }
+
+        result = self.execute_query(query, parameters)
+        return len(result) > 0
+
+    def get_document_node(self, document_id: str) -> Optional[Dict]:
+        """获取文档节点"""
+        if not self.connected:
+            return None
+
+        query = "MATCH (d:Document {id: $document_id}) RETURN d"
+        result = self.execute_query(query, {"document_id": document_id})
+
+        return result[0]["d"] if result else None
+
+    # ==================== 实体节点操作 ====================
+
+    def create_entity_node(self, entity: Dict, document_id: str) -> bool:
+        """
+        创建实体节点并关联文档
+
+        Args:
+            entity: 实体信息 {text, label, start, end, confidence}
+            document_id: 所属文档ID
+
+        Returns:
+            是否成功
+        """
+        if not self.connected:
+            return False
+
+        # 生成实体ID（基于文本和标签）
+        entity_id = f"{entity['label']}_{entity['text']}"
+
+        query = """
+        // 创建或合并实体节点
+        MERGE (e:Entity {id: $entity_id})
+        SET e.text = $text,
+            e.label = $label,
+            e.confidence = $confidence
+
+        // 连接到文档
+        WITH e
+        MATCH (d:Document {id: $document_id})
+        MERGE (d)-[r:MENTIONS]->(e)
+        SET r.count = coalesce(r.count, 0) + 1,
+            r.first_position = CASE WHEN r.first_position IS NULL THEN [$start, $end] ELSE r.first_position END
+
+        RETURN e
+        """
+
+        parameters = {
+            "entity_id": entity_id,
+            "text": entity["text"],
+            "label": entity["label"],
+            "confidence": entity.get("confidence", 1.0),
+            "document_id": document_id,
+            "start": entity.get("start", 0),
+            "end": entity.get("end", 0)
+        }
+
+        result = self.execute_query(query, parameters)
+        return len(result) > 0
+
+    def batch_create_entities(self, entities: List[Dict], document_id: str) -> int:
+        """
+        批量创建实体节点
+
+        Args:
+            entities: 实体列表
+            document_id: 文档ID
+
+        Returns:
+            成功创建的数量
+        """
+        if not self.connected:
+            return 0
+
+        count = 0
+        for entity in entities:
+            if self.create_entity_node(entity, document_id):
+                count += 1
+
+        logger.info(f"Created {count}/{len(entities)} entity nodes")
+        return count
+
+    # ==================== 关系操作 ====================
+
+    def create_relation(self, relation: Dict) -> bool:
+        """
+        创建实体间关系
+
+        Args:
+            relation: 关系信息 {subject, predicate, object, confidence, evidence}
+
+        Returns:
+            是否成功
+        """
+        if not self.connected:
+            return False
+
+        # 根据谓词类型动态创建关系
+        predicate = relation["predicate"].upper().replace(" ", "_")
+
+        query = f"""
+        MATCH (e1:Entity), (e2:Entity)
+        WHERE e1.text = $subject AND e2.text = $object
+        MERGE (e1)-[r:{predicate}]->(e2)
+        SET r.confidence = $confidence,
+            r.evidence = $evidence
+        RETURN r
+        """
+
+        parameters = {
+            "subject": relation["subject"],
+            "object": relation["object"],
+            "confidence": relation.get("confidence", 0.5),
+            "evidence": relation.get("evidence", "")
+        }
+
+        result = self.execute_query(query, parameters)
+        return len(result) > 0
+
+    def batch_create_relations(self, relations: List[Dict]) -> int:
+        """
+        批量创建关系
+
+        Args:
+            relations: 关系列表
+
+        Returns:
+            成功创建的数量
+        """
+        if not self.connected:
+            return 0
+
+        count = 0
+        for relation in relations:
+            if self.create_relation(relation):
+                count += 1
+
+        logger.info(f"Created {count}/{len(relations)} relationships")
+        return count
+
+    # ==================== 查询操作 ====================
+
+    def get_entity_neighbors(
+            self,
+            entity_text: str,
+            max_depth: int = 2,
+            limit: int = 50
+    ) -> Dict[str, Any]:
+        """
+        获取实体的邻居节点（子图）
+
+        Args:
+            entity_text: 实体文本
+            max_depth: 最大深度
+            limit: 返回数量限制
+
+        Returns:
+            子图数据 {nodes: [], edges: []}
+        """
+        if not self.connected:
+            return {"nodes": [], "edges": []}
+
+        query = """
+        MATCH path = (e:Entity {text: $entity_text})-[*1..$max_depth]-(neighbor)
+        WITH e, neighbor, relationships(path) as rels
+        LIMIT $limit
+        WITH 
+            collect(DISTINCT {
+                id: e.id,
+                text: e.text,
+                label: e.label,
+                confidence: e.confidence
+            }) + collect(DISTINCT {
+                id: neighbor.id,
+                text: neighbor.text,
+                label: neighbor.label,
+                confidence: neighbor.confidence
+            }) as nodes,
+            [r IN rels | {
+                source: startNode(r).text,
+                target: endNode(r).text,
+                type: type(r)
+            }] as edges
+        RETURN nodes, edges
+        """
+
+        parameters = {
+            "entity_text": entity_text,
+            "max_depth": max_depth,
+            "limit": limit
+        }
+
+        result = self.execute_query(query, parameters)
+
+        if result:
+            return result[0]
+        return {"nodes": [], "edges": []}
+
+    def search_entities_by_label(self, label: str, limit: int = 20) -> List[Dict]:
+        """
+        按标签搜索实体
+
+        Args:
+            label: 实体标签
+            limit: 返回数量
+
+        Returns:
+            实体列表
+        """
+        if not self.connected:
+            return []
+
+        query = """
+        MATCH (e:Entity {label: $label})
+        RETURN e.text as text, e.label as label, e.confidence as confidence
+        LIMIT $limit
+        """
+
+        return self.execute_query(query, {"label": label, "limit": limit})
+
+    def find_path_between_entities(
+        self,
+        entity1: str,
+        entity2: str,
+        max_depth: int = 5
+    ) -> List[Dict]:
+        """
+        查找两个实体之间的路径
+
+        Args:
+            entity1: 实体1文本
+            entity2: 实体2文本
+            max_depth: 最大深度
+
+        Returns:
+            路径列表
+        """
+        if not self.connected:
+            return []
+
+        query = """
+        MATCH path = shortestPath(
+            (e1:Entity {text: $entity1})-[*1..$max_depth]-(e2:Entity {text: $entity2})
+        )
+        RETURN [node IN nodes(path) | node.text] as path,
+               [rel IN relationships(path) | type(rel)] as relations,
+               length(path) as length
+        """
+
+        parameters = {
+            "entity1": entity1,
+            "entity2": entity2,
+            "max_depth": max_depth
+        }
+
+        return self.execute_query(query, parameters)
+
+    def get_document_graph(self, document_id: str) -> Dict[str, Any]:
+        """
+        获取文档的完整知识图谱
+
+        Args:
+            document_id: 文档ID
+
+        Returns:
+            图数据 {nodes: [], edges: []}
+        """
+        if not self.connected:
+            return {"nodes": [], "edges": []}
+
+        query = """
+        MATCH (d:Document {id: $document_id})-[:MENTIONS]->(e:Entity)
+        OPTIONAL MATCH (e)-[r]-(other:Entity)
+        WITH e, other, r
+        WITH 
+            collect(DISTINCT {
+                id: e.id,
+                text: e.text,
+                label: e.label,
+                confidence: e.confidence
+            }) + collect(DISTINCT CASE WHEN other IS NOT NULL THEN {
+                id: other.id,
+                text: other.text,
+                label: other.label,
+                confidence: other.confidence
+            } ELSE null END) as nodes,
+            collect(DISTINCT CASE WHEN r IS NOT NULL THEN {
+                source: startNode(r).text,
+                target: endNode(r).text,
+                type: type(r),
+                confidence: r.confidence
+            } ELSE null END) as edges
+        RETURN nodes, edges
+        """
+
+        result = self.execute_query(query, {"document_id": document_id})
+
+        if result and len(result) > 0:
+            data = result[0]
+            # 过滤掉 null 值
+            return {
+                "nodes": [n for n in data.get("nodes", []) if n is not None],
+                "edges": [e for e in data.get("edges", []) if e is not None]
+            }
+        return {"nodes": [], "edges": []}
+
+
+# 测试代码
+if __name__ == "__main__":
+    # 创建管理器
+    manager = Neo4jManager()
+
+    if manager.connected:
+        # 创建约束
+        manager.create_constraints()
+
+        # 测试文档创建
+        doc_id = "test_doc_001"
+        manager.create_document_node(doc_id, {
+            "file_name": "test.pdf",
+            "title": "测试文档",
+            "author": "张三",
+            "file_type": "pdf"
+        })
+
+        # 测试实体创建
+        test_entities = [
+            {"text": "机器学习", "label": "TECH", "confidence": 0.9, "start": 0, "end": 4},
+            {"text": "深度学习", "label": "TECH", "confidence": 0.9, "start": 10, "end": 14},
+            {"text": "清华大学", "label": "ORG", "confidence": 0.85, "start": 20, "end": 24}
+        ]
+        manager.batch_create_entities(test_entities, doc_id)
+
+        # 测试关系创建
+        test_relations = [
+            {
+                "subject": "深度学习",
+                "predicate": "IS_A",
+                "object": "机器学习",
+                "confidence": 0.9,
+                "evidence": "深度学习是机器学习的一个分支"
+            }
+        ]
+        manager.batch_create_relations(test_relations)
+
+        # 获取统计
+        stats = manager.get_stats()
+        print(f"\n知识图谱统计: {stats}")
+
+        # 关闭连接
+        manager.close()
+    else:
+        print("Neo4j未连接，跳过测试")

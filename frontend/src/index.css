@@ -1,0 +1,676 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #0a0e27;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.ant-layout {
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+/* ==================== 暗色主题全局样式 ==================== */
+
+/* Card 组件 */
+.ant-card {
+  background: rgba(15, 20, 35, 0.7) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.ant-card-head-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.ant-card-body {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Table 组件 */
+.ant-table {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(0, 21, 41, 0.6) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-table-tbody > tr > td {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(0, 212, 255, 0.05) !important;
+}
+
+/* Button 组件 */
+.ant-btn {
+  background: rgba(0, 21, 41, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: all 0.3s;
+}
+
+.ant-btn:hover {
+  background: rgba(0, 21, 41, 0.8) !important;
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  color: #00d4ff !important;
+}
+
+.ant-btn-default {
+  background: rgba(0, 21, 41, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-btn-default:hover {
+  background: rgba(0, 21, 41, 0.8) !important;
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  color: #00d4ff !important;
+}
+
+/* Radio Button 单选按钮组 */
+.ant-radio-button-wrapper {
+  background: rgba(0, 21, 41, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-radio-button-wrapper:hover {
+  color: #00d4ff !important;
+}
+
+.ant-radio-button-wrapper-checked {
+  background: rgba(0, 212, 255, 0.2) !important;
+  border-color: #00d4ff !important;
+  color: #00d4ff !important;
+}
+
+.ant-radio-button-wrapper-checked:hover {
+  background: rgba(0, 212, 255, 0.3) !important;
+  border-color: #00d4ff !important;
+  color: #00d4ff !important;
+}
+
+.ant-radio-button-wrapper::before {
+  background: rgba(0, 212, 255, 0.3) !important;
+}
+
+/* Segmented 分段控制器 */
+.ant-segmented {
+  background: rgba(0, 21, 41, 0.6) !important;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.ant-segmented-item {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-segmented-item:hover {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-segmented-item-selected {
+  background: rgba(0, 212, 255, 0.2) !important;
+  color: #00d4ff !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.ant-segmented-thumb {
+  background: rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Input 组件 */
+.ant-input,
+.ant-input-number,
+.ant-input-affix-wrapper,
+.ant-input-password,
+.ant-picker {
+  background: rgba(10, 14, 39, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-input::placeholder,
+.ant-input-number::placeholder {
+  color: rgba(0, 212, 255, 0.4) !important;
+}
+
+.ant-input:hover,
+.ant-input:focus,
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper:focus,
+.ant-input-password:hover,
+.ant-input-password:focus {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.1) !important;
+  background: rgba(10, 14, 39, 0.8) !important;
+}
+
+.ant-input-affix-wrapper-focused,
+.ant-input-password-focused {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.1) !important;
+  background: rgba(10, 14, 39, 0.8) !important;
+}
+
+/* Input 内部的 input 元素 */
+.ant-input-affix-wrapper input,
+.ant-input-password input {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-input-affix-wrapper input::placeholder,
+.ant-input-password input::placeholder {
+  color: rgba(0, 212, 255, 0.4) !important;
+}
+
+/* TextArea */
+.ant-input-textarea-show-count::after {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+textarea.ant-input {
+  background: rgba(10, 14, 39, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+textarea.ant-input:hover,
+textarea.ant-input:focus {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  background: rgba(10, 14, 39, 0.8) !important;
+}
+
+/* Select 组件 */
+.ant-select-selector {
+  background: rgba(10, 14, 39, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-select-arrow {
+  color: rgba(0, 212, 255, 0.6) !important;
+}
+
+/* Dropdown 下拉菜单 */
+.ant-dropdown,
+.ant-select-dropdown {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.ant-dropdown-menu-item,
+.ant-select-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-dropdown-menu-item:hover,
+.ant-select-item-option-selected,
+.ant-select-item:hover {
+  background: rgba(0, 212, 255, 0.1) !important;
+  color: #00d4ff !important;
+}
+
+/* Message 消息提示 */
+.ant-message-notice-content {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Alert 组件 */
+.ant-alert {
+  background: rgba(15, 20, 35, 0.7) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-alert-info {
+  background: rgba(0, 212, 255, 0.1) !important;
+  border-color: rgba(0, 212, 255, 0.4) !important;
+}
+
+.ant-alert-warning {
+  background: rgba(250, 173, 20, 0.1) !important;
+  border-color: rgba(250, 173, 20, 0.4) !important;
+}
+
+.ant-alert-success {
+  background: rgba(82, 196, 26, 0.1) !important;
+  border-color: rgba(82, 196, 26, 0.4) !important;
+}
+
+.ant-alert-error {
+  background: rgba(255, 77, 79, 0.1) !important;
+  border-color: rgba(255, 77, 79, 0.4) !important;
+}
+
+.ant-alert-message,
+.ant-alert-description {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Tag 组件 */
+.ant-tag {
+  background: rgba(0, 212, 255, 0.15) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Modal 对话框 */
+.ant-modal-content {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+.ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-modal-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.ant-modal-body {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-modal-footer {
+  border-top: 1px solid rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Spin 加载 */
+.ant-spin-text {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Divider 分割线 */
+.ant-divider {
+  border-color: rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-divider-inner-text {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Collapse 折叠面板 */
+.ant-collapse {
+  background: transparent !important;
+  border-color: rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-collapse-item {
+  border-color: rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-collapse-header {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-collapse-content {
+  background: rgba(0, 21, 41, 0.3) !important;
+  border-color: rgba(0, 212, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Typography */
+.ant-typography {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-typography-secondary {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Upload 上传组件 */
+.ant-upload-wrapper {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-upload-drag {
+  background: rgba(10, 14, 39, 0.4) !important;
+  border: 2px dashed rgba(0, 212, 255, 0.3) !important;
+  border-radius: 8px;
+}
+
+.ant-upload-drag:hover {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+  background: rgba(10, 14, 39, 0.6) !important;
+}
+
+.ant-upload-drag-icon .anticon {
+  color: rgba(0, 212, 255, 0.6) !important;
+}
+
+.ant-upload-text {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-upload-hint {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Empty 空状态 */
+.ant-empty {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.ant-empty-description {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.ant-empty-image svg {
+  opacity: 0.3;
+}
+
+/* 空状态容器 */
+.ant-empty-normal {
+  background: transparent !important;
+}
+
+/* 修复空状态的白色背景 */
+.ant-list-empty-text,
+.ant-table-placeholder,
+.ant-select-item-empty {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Statistic 统计数值 */
+.ant-statistic {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-statistic-title {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-statistic-content {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* List 列表 */
+.ant-list {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-list-item {
+  border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Descriptions 描述列表 */
+.ant-descriptions {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-descriptions-item-label {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-descriptions-item-content {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Steps 步骤条 */
+.ant-steps-item-title {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-steps-item-description {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* 表格空状态 */
+.ant-table-placeholder {
+  background: transparent !important;
+}
+
+.ant-table-placeholder .ant-empty-description {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+/* Form 表单标签 */
+.ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Checkbox & Radio */
+.ant-checkbox-wrapper,
+.ant-radio-wrapper {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Pagination 分页 */
+.ant-pagination {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-pagination-item {
+  background: rgba(10, 14, 39, 0.6) !important;
+  border-color: rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-pagination-item a {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-pagination-item:hover {
+  border-color: rgba(0, 212, 255, 0.6) !important;
+}
+
+.ant-pagination-item-active {
+  background: rgba(0, 212, 255, 0.2) !important;
+  border-color: #00d4ff !important;
+}
+
+/* Breadcrumb 面包屑 */
+.ant-breadcrumb {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+.ant-breadcrumb a {
+  color: rgba(0, 212, 255, 0.85) !important;
+}
+
+/* Progress 进度条 */
+.ant-progress-text {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Result 结果页 */
+.ant-result-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.ant-result-subtitle {
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* Timeline 时间轴 */
+.ant-timeline-item-content {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 修复所有可能的白色背景 */
+.ant-card,
+.ant-modal-content,
+.ant-drawer-content,
+.ant-popover-inner,
+.ant-tooltip-inner {
+  background: rgba(15, 20, 35, 0.9) !important;
+}
+
+/* Drawer 抽屉 */
+.ant-drawer-content {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+}
+
+.ant-drawer-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-drawer-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.ant-drawer-body {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Popover & Tooltip */
+.ant-popover-inner {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3) !important;
+}
+
+.ant-popover-title {
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2) !important;
+}
+
+.ant-popover-inner-content {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.ant-tooltip-inner {
+  background: rgba(15, 20, 35, 0.95) !important;
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 修复特定页面组件 */
+/* 知识图谱可视化容器 */
+#graph-container,
+.graph-container,
+[id*="graph"],
+[class*="graph"] {
+  background: rgba(10, 14, 39, 0.5) !important;
+  border-radius: 8px;
+}
+
+/* 对话框容器 */
+.chat-container,
+.message-container,
+[class*="chat"],
+[class*="message"] {
+  background: transparent !important;
+}
+
+/* 所有文本默认颜色 */
+p, span, div, a, li, td, th, label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+a {
+  color: rgba(0, 212, 255, 0.85);
+}
+
+a:hover {
+  color: #00d4ff;
+}
+
+/* 强制覆盖任何可能的白色背景 */
+[style*="background: white"],
+[style*="background: #fff"],
+[style*="background-color: white"],
+[style*="background-color: #fff"],
+[style*="background: rgb(255, 255, 255)"],
+[style*="backgroundColor: white"],
+div[style*="background"][style*="255"] {
+  background: rgba(15, 20, 35, 0.7) !important;
+}
+
+/* 强制覆盖黑色文字 */
+[style*="color: black"],
+[style*="color: #000"],
+[style*="color: rgb(0, 0, 0)"] {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* 修复特定的白色背景组件 */
+div[style*="padding"][style*="background"] {
+  background: rgba(15, 20, 35, 0.5) !important;
+}
+
+/* 聊天输入框区域 */
+[class*="input-area"],
+[class*="chat-input"],
+[id*="chat-input"] {
+  background: rgba(10, 14, 39, 0.6) !important;
+}
+
+/* 提示文本区域 */
+[class*="placeholder"],
+[class*="hint"],
+[class*="tip"] {
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 21, 41, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* 选中文本颜色 */
+::selection {
+  background: rgba(0, 212, 255, 0.3);
+  color: #fff;
+}
+
